@@ -61,7 +61,6 @@ class Item(Resource):
 
 
 class ItemList(Resource):
-    TABLE_NAME = 'items'
 
     def get(self):
         # items = list(map(lambda item: item.json(), items))
