@@ -1,4 +1,3 @@
-# from werkzeug.security import safe_str_cmp
 from hmac import compare_digest
 from models.user import UserModel
 
