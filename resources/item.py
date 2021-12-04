@@ -16,13 +16,14 @@ class Item(Resource):
                         help="Every item needs a store_id."
                         )
 
-    @jwt_required()
+    @jwt_required(optional=True)
     def get(self, name):
         item = ItemModel.find_by_name(name)
         if item:
             return item.json()
         return {'message': 'Item not found'}, 404
 
+    @jwt_required(refresh=True)
     def post(self, name: str):
         if ItemModel.find_by_name(name=name):
             return {'message': "An item with name '{}' already exists.".format(name)}
@@ -38,7 +39,7 @@ class Item(Resource):
 
         return item.json()
 
-    @jwt_required()
+    @jwt_required(optional=True)
     def delete(self, name: str):
         claims = get_jwt()
         if not claims['is_admin']:
