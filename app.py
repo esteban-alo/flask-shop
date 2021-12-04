@@ -1,3 +1,4 @@
+from blacklist import BLACKLIST
 from db import db
 
 from flask import Flask, jsonify
@@ -12,6 +13,8 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPAGATE_EXCEPTIONS'] = True
+app.config['JWT_BLACKLIST_ENABLED'] = True  # Enable blacklist feature
+app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']  # Allow blacklisting for access and refresh tokens
 app.secret_key = '000-000-000-000'
 
 db.init_app(app)
@@ -31,6 +34,8 @@ jwt = JWTManager(app)  # auth
 and for each jwt protected endpoint, we can retrieve these claims via 
 `additional_claims_loader()`
 """
+
+
 @jwt.additional_claims_loader
 def add_claims_to_jwt(identity):
     if identity == 1:  # instead of hard-coding, we should read from a config file to get a list of admins instead
@@ -41,7 +46,7 @@ def add_claims_to_jwt(identity):
 # The following callbacks are used for customizing jwt response/error messages.
 # The original ones may not be in a very pretty format (opinionated)
 @jwt.expired_token_loader
-def expired_token_callback():
+def expired_token_callback(jwt_header, jwt_payload):
     return jsonify({
         'message': 'The token has expired.',
         'error': 'token_expired'
@@ -70,6 +75,11 @@ def token_not_fresh_callback():
         "description": "The token is not fresh.",
         'error': 'fresh_token_required'
     }), 401
+
+
+@jwt.token_in_blocklist_loader
+def check_if_token_in_blacklist(jwt_headers, jwt_payload):
+    return jwt_payload['jti'] in BLACKLIST
 
 
 api.add_resource(Item, '/items/<string:name>')
