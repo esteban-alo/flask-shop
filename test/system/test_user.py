@@ -33,5 +33,5 @@ class UserTest(BaseTest):
                 r = c.post('/register', data={'username': 'test', 'password': '1234'})
 
                 self.assertEqual(r.status_code, 400)
-                self.assertDictEqual(d1={'message': 'A user with that username already exists'},
+                self.assertDictEqual(d1={'message': 'User with that username already exists.'},
                                      d2=json.loads(r.data))

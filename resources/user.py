@@ -44,7 +44,7 @@ class User(Resource):
     def get(cls, user_id: int):
         user = UserModel.find_by_id(_id=user_id)
         if not user:
-            return {'message': 'User not foud'}, 404
+            return {'message': 'User not found'}, 404
         return user.json()
 
     @classmethod
@@ -52,7 +52,7 @@ class User(Resource):
         user = UserModel.find_by_id(_id=user_id)
 
         if not user:
-            return {'message': 'User not foud'}, 404
+            return {'message': 'User not found'}, 404
 
         user.delete_from_db()
 
